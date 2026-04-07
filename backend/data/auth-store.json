@@ -1,0 +1,41 @@
+{
+  "nextUserId": 3,
+  "users": [
+    {
+      "id": 1,
+      "email": "skvigneshwar07@gmail.com",
+      "name": "VGN",
+      "passwordHash": "56210de7443dcf4174e0e19ec7bb862e3b4494a6d78bbb936c4495871240c1715a3e4990cb915fe85d0e7e03c68baed851c665cc61bbfe0d147713e6ad81b550",
+      "passwordSalt": "158ac3f2d51b58d1d4ce931e52e92ff3",
+      "emailVerified": true,
+      "createdAt": "2026-04-07T15:20:09.509Z",
+      "updatedAt": "2026-04-07T15:27:37.988Z"
+    },
+    {
+      "id": 2,
+      "email": "srvskv2007@gmail.com",
+      "name": "test",
+      "passwordHash": "dbc6617ffed96cfe73ac45069e728c5eb12e6d1d6315d427a5669991705e549e4e55fbad6c359f843d323451750f55ca9617cbeb68c98279558344a02ab86588",
+      "passwordSalt": "44c9188e702c25955e6b1539f6b515b3",
+      "emailVerified": true,
+      "createdAt": "2026-04-07T15:29:01.514Z",
+      "updatedAt": "2026-04-07T15:29:22.922Z"
+    }
+  ],
+  "verificationCodes": [
+    {
+      "email": "skvigneshwar07@gmail.com",
+      "codeHash": "be844534af8f76ca8607fb9ded0cdfde0f10917e6121f33457aec180ba6eb9d0",
+      "expiresAt": "2026-04-07T15:37:11.037Z",
+      "consumed": true,
+      "createdAt": "2026-04-07T15:27:10.995Z"
+    },
+    {
+      "email": "srvskv2007@gmail.com",
+      "codeHash": "7a09b799d53833ed4621b561f477977ecf4404ab9c5d9b494df8e6cd9b1a8782",
+      "expiresAt": "2026-04-07T15:39:01.563Z",
+      "consumed": true,
+      "createdAt": "2026-04-07T15:29:01.514Z"
+    }
+  ]
+}

@@ -1,0 +1,160 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id            Int       @id @default(autoincrement())
+  email         String    @unique
+  passwordHash  String
+  name          String
+  age           Int?
+  bio           String?
+  avatarUrl     String?
+  emailVerified Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  skills        UserSkill[]
+  interests     UserInterest[]
+  ownedProjects Project[]      @relation("OwnedProjects")
+  memberships   ProjectMember[]
+  invites       ProjectInvite[]    @relation("InvitedUser")
+  joinRequests  ProjectJoinRequest[] @relation("Requester")
+  opportunities Opportunity[]
+  feedEvents    FeedEvent[]   @relation("Actor")
+  verificationCodes EmailVerificationCode[]
+}
+
+model Skill {
+  id    Int         @id @default(autoincrement())
+  name  String      @unique
+  users UserSkill[]
+}
+
+model UserSkill {
+  userId  Int
+  skillId Int
+
+  user User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  skill Skill @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@id([userId, skillId])
+}
+
+model Interest {
+  id    Int            @id @default(autoincrement())
+  name  String         @unique
+  users UserInterest[]
+}
+
+model UserInterest {
+  userId     Int
+  interestId Int
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  interest Interest @relation(fields: [interestId], references: [id], onDelete: Cascade)
+
+  @@id([userId, interestId])
+}
+
+model Project {
+  id          Int            @id @default(autoincrement())
+  ownerId     Int
+  title       String
+  description String?
+  techStack   String[]       @default([])
+  status      String         @default("open") // open, in_progress, closed
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  owner       User           @relation("OwnedProjects", fields: [ownerId], references: [id])
+  members     ProjectMember[]
+  invites     ProjectInvite[]
+  joinRequests ProjectJoinRequest[]
+  opportunities Opportunity[]
+  feedEvents   FeedEvent[]   @relation("ProjectEvents")
+}
+
+model ProjectMember {
+  projectId Int
+  userId    Int
+  role      String   @default("member") // owner, member, mentor
+  joinedAt  DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([projectId, userId])
+}
+
+model ProjectInvite {
+  id             Int      @id @default(autoincrement())
+  projectId      Int
+  invitedUserId  Int?
+  invitedHandle  String?
+  status         String   @default("pending") // pending, accepted, declined
+  createdAt      DateTime @default(now())
+  respondedAt    DateTime?
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  invitedUser User? @relation("InvitedUser", fields: [invitedUserId], references: [id])
+}
+
+model ProjectJoinRequest {
+  id           Int      @id @default(autoincrement())
+  projectId    Int
+  requesterId  Int
+  status       String   @default("pending") // pending, accepted, rejected
+  message      String?
+  createdAt    DateTime @default(now())
+  respondedAt  DateTime?
+
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  requester User    @relation("Requester", fields: [requesterId], references: [id])
+}
+
+model Opportunity {
+  id          Int       @id @default(autoincrement())
+  creatorId   Int
+  projectId   Int?
+  type        String    // 'hackathon_opening', 'looking_for_teammates', 'hiring'
+  title       String
+  description String?
+  contact     String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  creator User    @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  project Project @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  feedEvents FeedEvent[]
+}
+
+model FeedEvent {
+  id            Int       @id @default(autoincrement())
+  actorId       Int?
+  projectId     Int?
+  opportunityId Int?
+  type          String    // 'project_created', 'opportunity_created', 'request_teammates', 'join_request', 'invite_sent', 'request_accepted'
+  message       String
+  createdAt     DateTime  @default(now())
+
+  actor       User?      @relation("Actor", fields: [actorId], references: [id])
+  project     Project?   @relation("ProjectEvents", fields: [projectId], references: [id])
+  opportunity Opportunity? @relation(fields: [opportunityId], references: [id])
+}
+
+model EmailVerificationCode {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  code       String   // 6-digit OTP
+  expiresAt  DateTime
+  consumed   Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
